@@ -1,0 +1,1258 @@
+@font-face {
+  font-family: 'Chicago';
+  src: url('ChicagoFLF.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+  position: relative;
+  font-family: Chicago, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+  color: #fff;
+}
+
+h3 {
+  color: #33FF33;
+  margin: 0;
+}
+
+p {
+  margin: 0.2rem 0;
+}
+
+/* Layout */
+
+.main {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("thumbnail_noice.JPG");
+  background-size: cover;
+  background-position: center;
+}
+
+.intro,
+.right {
+  position: static;
+}
+/* Terminal window shell */
+
+.terminal-window {
+  position: fixed;
+  display: none;            /* 🔹 hidden at first */
+  background-color: #000;
+  border-radius: 10px;
+  border: 1px solid #33FF33;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+    opacity: 0;
+  transform: scale(0.9) translateY(12px);
+  transform-origin: center center;
+  will-change: transform, opacity, box-shadow;
+  z-index: 1000;
+}
+
+
+/* Mac-style open animation */
+.terminal-window.mac-open {
+  animation: mac-window-open 220ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+@keyframes mac-window-open {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.02) translateY(0);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* .terminal-window-left {
+  position: relative;
+  top: 2%;
+  height: 94vh;
+}
+
+.side-terminal {
+  height: 45vh;
+}
+
+.side-terminal-top,
+.side-terminal-bottom {
+  position: absolute; 
+}
+
+.side-terminal-top {
+  top: 8%;
+  right: 3%;
+  width: 43vw;
+  height: 55vh;
+}
+
+.side-terminal-bottom {
+  bottom: 5%;
+  right: 3%;
+  width: 43vw;
+  height: 35vh;
+} */
+
+/* LEFT main terminal */
+.terminal-window-left {
+  top: 10%;
+  left: 1%;
+  width: 60vw;
+  height: 85vh;
+}
+
+/* Shared right-side style (optional, nice for consistency) */
+.side-terminal {
+  width: 38vw;
+}
+
+/* Top-right: about terminal */
+.side-terminal-top {
+  top: 8%;
+  right: 5%;
+  height: 54vh;
+}
+
+/* Bottom-right: activity/log terminal */
+.side-terminal-bottom {
+  bottom: 9%;
+  right: 5%;
+  height: 30vh;
+  width: 33vw;
+}
+
+
+/* Terminal header */
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background-color: #202020;
+  border-bottom: 1px solid #33FF33;
+  user-select: none;
+}
+
+.terminal-title {
+  margin-left: 4px;
+  font-size: 0.8rem;
+  color: #9e9e9e;
+}
+
+/* Window dots */
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.dot.red { background-color: #ff5f57; }
+.dot.yellow { background-color: #febc2e; }
+.dot.green { background-color: #28c840; }
+
+/* Terminal body */
+
+.terminal-body {
+  flex: 1;
+  padding: 14px 16px;
+  overflow-y: auto;
+  background-color: #000;
+  line-height: 1.5;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.intro_con {
+  font-size: 1.5rem;
+}
+
+.dir-listing {
+  display: flex;
+  flex-direction: column;
+}
+
+.intro_con p {
+  white-space: pre-wrap;
+}
+
+.zade {
+  display: inline-flex;
+  gap: 0;
+}
+
+.file-link {
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  text-underline-offset: 2px;
+}
+
+.file-link:hover {
+  color: #f0f;
+}
+
+/* typing caret */
+
+.typing::after {
+  content: "▋";
+  display: inline-block;
+  animation: blink 0.9s steps(1) infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
+
+/* Hidden file content sections */
+
+.file-content {
+  display: none;
+}
+
+.background-roblox-center {
+  display: flex;
+  justify-content: center;
+}
+
+.background-roblox {
+  background-image: url("public/img/eda-background.png");
+  height: 2968px;
+  width: 1080px;;
+}
+
+/* Prompt */
+
+.prompt {
+  padding: 0;
+}
+
+/* Popup window (for files and 3D app) */
+
+.window {
+  position: fixed;
+  top: 7%;
+  left: 50%;
+  /* just use translateX for centering, no scale */
+  transform: translateX(-50%);
+  width: 80vw;
+  max-width: 90vw;
+  max-height: 90vh;
+  background-color: #000;
+  border: 1px solid #33FF33;
+  border-radius: 8px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.8);
+  color: #33FF33;
+  font-family: Chicago, monospace;
+  z-index: 999999;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 160ms ease-out,
+    box-shadow 160ms ease-out;   /* 👈 transform removed */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.window.show {
+  opacity: 1;
+  /* no transform: we keep the same translateX(-50%) from .window */
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.95);
+  pointer-events: auto;
+}
+
+
+.window-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background-color: #202020;
+  border-bottom: 1px solid #33FF33;
+  border-radius: 8px 8px 0 0;
+  user-select: none;
+}
+
+.window-title {
+  margin-left: 4px;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.window-close {
+  margin-left: auto;
+  font-size: 0.8rem;
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.window-close:hover {
+  opacity: 1;
+}
+
+.window-body {
+  flex: 1;
+  padding: 10px 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  white-space: normal;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===== Stuff I've Built popup ===== */
+
+#stuff-ive-built-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+/* Canvas inside 3D popup */
+#stuff-ive-built-root canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: auto;
+}
+
+#stuff-ive-built-root canvas.hover-grab {
+  cursor: grab;
+}
+#stuff-ive-built-root canvas.dragging {
+  cursor: grabbing;
+}
+
+/* Tooltip inside popup */
+
+#siv-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+  z-index: 20;
+}
+
+#siv-tooltip.hidden {
+  display: none;
+}
+
+#siv-tooltip .content {
+  pointer-events: auto;
+  background: #000;
+  border: 3px #00ff00 solid;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  position: absolute;
+  transform: translate(60%, -50%);
+  width: 32vw;
+  max-width: 420px;
+  height: 55vh;         
+  display: flex;
+  flex-direction: column;
+  color: #00ff00;
+}
+
+
+#siv-tip-close {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: #00ff00;
+  font-weight: bold;
+  z-index: 100;
+}
+
+#siv-tip-close:hover {
+  color: #ff00ff;
+}
+
+.siv-content-box {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+}
+
+.siv-tip-block {
+  display: none;
+  width: 100%;
+  padding-right: 6px;
+}
+
+
+.siv-tip-block h1 {
+  font-size: 1rem;
+  margin: 0 0 0.4rem;
+}
+
+.siv-tip-block label {
+  font-size: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.siv-tip-block p {
+  font-size: 0.75rem;
+  color: #eee;
+}
+
+/* connector SVG inside popup */
+
+#siv-connectors {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 15;
+}
+
+
+.terminal-body-topright {
+  font-size: 1.3rem;
+}
+
+
+
+.main_img {
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  background-color:  #95BEDD;
+  /* background-image: url("thumbnail_noice.JPG"); */
+}
+
+
+/* =========================================
+   TextEdit-style windows for .txt files
+   ========================================= */
+
+.window-textedit {
+  background-color: #f7f7f7;
+  border-color: #d0d0d0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color: #222;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    -system-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  width: 40vw;
+  top: 12%;
+}
+
+.window-textedit .window-header {
+  background: linear-gradient(to bottom, #e9e9e9, #dcdcdc);
+  border-bottom: 1px solid #c8c8c8;
+  border-radius: 8px 8px 0 0;
+  padding: 5px 10px;
+  align-items: center;
+}
+
+/* Traffic lights stay left, title centered-ish like macOS */
+.window-textedit .dot {
+  width: 9px;
+  height: 9px;
+}
+
+.window-textedit .window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.79rem;
+  color: #555;
+  font-weight: 500;
+  margin-right: 18px; /* compensate for close "x" */
+}
+
+.window-textedit .window-close {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 6px;
+}
+
+.window-textedit .window-close:hover {
+  color: #ff3b30;
+}
+
+/* Text area look: like a clean TextEdit document */
+.window-textedit .window-body {
+  background-color: #ffffff;
+  color: #222;
+  padding: 14px 18px;
+  border-radius: 0 0 8px 8px;
+  font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: calc(80vh - 32px);
+  box-shadow: inset 0 0 0 1px #f0f0f0;
+}
+
+.window-textedit .window-body h2,
+.window-textedit .window-body h3 {
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.window-textedit .window-body p {
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+
+.window-textedit .window-body ul {
+  margin: 0 0 0.4rem 1.2rem;
+  padding: 0;
+}
+
+/* MP4 file styling */
+
+.window-mp4 {
+  background-color: #f7f7f7;
+  border-color: #d0d0d0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color: #222;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    -system-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.window-mp4 .window-header {
+  background: linear-gradient(to bottom, #e9e9e9, #dcdcdc);
+  border-bottom: 1px solid #c8c8c8;
+  border-radius: 8px 8px 0 0;
+  padding: 5px 10px;
+  align-items: center;
+}
+
+/* Traffic lights stay left, title centered-ish like macOS */
+.window-mp4 .dot {
+  width: 9px;
+  height: 9px;
+}
+
+.window-mp4 .window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #555;
+  font-weight: 500;
+  margin-right: 18px; /* compensate for close "x" */
+}
+
+.window-mp4 .window-close {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 6px;
+}
+
+.window-mp4 .window-close:hover {
+  color: #ff3b30;
+}
+
+/* Text area look: like a clean TextEdit document */
+.window-mp4 .window-body {
+  background-color: #ffffff;
+  color: #222;
+  padding: 14px 18px;
+  border-radius: 0 0 8px 8px;
+  font-family: "SF Mono", Menlo, Monaco, "Courier New", monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: calc(80vh - 32px);
+  box-shadow: inset 0 0 0 1px #f0f0f0;
+}
+
+.window-mp4 .window-body h2,
+.window-mp4 .window-body h3 {
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.window-mp4 .window-body p {
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+
+.window-mp4 .window-body ul {
+  margin: 0 0 0.4rem 1.2rem;
+  padding: 0;
+}
+
+/* MD styling */
+
+.window-md {
+  background-color: #f7f7f7;
+  border-color: #d0d0d0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color: #222;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    -system-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  width: 60vw;
+  top: 12%;
+}
+
+.window-md p {
+  font-size: 1.1rem;
+}
+
+
+.window-md .window-header {
+  background: linear-gradient(to bottom, #e9e9e9, #dcdcdc);
+  border-bottom: 1px solid #c8c8c8;
+  border-radius: 8px 8px 0 0;
+  padding: 5px 10px;
+  align-items: center;
+}
+
+/* Traffic lights stay left, title centered-ish like macOS */
+.window-md .dot {
+  width: 9px;
+  height: 9px;
+}
+
+.window-md .window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #555;
+  font-weight: 500;
+  margin-right: 18px; /* compensate for close "x" */
+}
+
+.window-md .window-close {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 6px;
+}
+
+.window-md .window-close:hover {
+  color: #ff3b30;
+}
+
+/* Text area look: like a clean TextEdit document */
+.window-md .window-body {
+  background-color: #ffffff;
+  color: #222;
+  padding: 14px 18px;
+  border-radius: 0 0 8px 8px;
+  font-family: "Mana Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: calc(80vh - 32px);
+  box-shadow: inset 0 0 0 1px #f0f0f0;
+}
+
+.window-md .window-body h1 {
+  font-family: inherit;
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: #000;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.window-md .window-body h2,
+.window-md .window-body h3 {
+  position: relative;
+  font-family: inherit;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: #000;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.window-md .window-body p {
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+
+.window-md .window-body ul {
+  margin: 0 0 0.4rem 1.2rem;
+  padding: 0;
+}
+
+/* pdf styling */
+
+.window-pdf {
+  background-color: #f7f7f7;
+  border-color: #d0d0d0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+  color: #222;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    -system-font, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  width: auto;
+  top: 12%;
+  padding: 0px 0px 0px 0px;
+  height: 90vh;
+}
+
+.window-pdf embed {
+  height: 90vh;
+  width: 100%;
+  object-fit: contain;
+}
+
+.window-pdf .window-header {
+  background: linear-gradient(to bottom, #e9e9e9, #dcdcdc);
+  border-bottom: 1px solid #c8c8c8;
+  border-radius: 8px 8px 0 0;
+  align-items: center;
+}
+
+/* Traffic lights stay left, title centered-ish like macOS */
+.window-pdf .dot {
+  width: 9px;
+  height: 9px;
+}
+
+.window-pdf .window-title {
+  flex: 1;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #555;
+  font-weight: 500;
+  margin-right: 18px; /* compensate for close "x" */
+}
+
+.window-pdf .window-close {
+  font-size: 0.75rem;
+  color: #666;
+  margin-left: 6px;
+}
+
+.window-pdf .window-close:hover {
+  color: #ff3b30;
+}
+
+/* Text area look: like a clean TextEdit document */
+.window-pdf .window-body {
+  background-color: #ffffff;
+  color: #222;
+  border-radius: 0 0 8px 8px;
+  font-family: "Mana Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  overflow-y: auto;
+  max-height: calc(80vh - 32px);
+  box-shadow: inset 0 0 0 1px #f0f0f0;
+  padding: 0;
+  width: 60vw;
+  height: auto;
+}
+
+.window-pdf .window-body h1 {
+  font-family: inherit;
+  font-size: 2.3rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: #000;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.window-pdf .window-body h2,
+.window-pdf .window-body h3 {
+  position: relative;
+  font-family: inherit;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  color: #000;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
+}
+
+.window-pdf .window-body p {
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+
+.window-pdf .window-body ul {
+  margin: 0 0 0.4rem 1.2rem;
+  padding: 0;
+}
+
+/* ========== macOS-style menu bar ========== */
+
+.macos-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
+  font-size: 1.2rem;
+  color: #000000;
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.06),
+              0 8px 18px rgba(0, 0, 0, 0.7);
+  z-index: 9999999;
+}
+
+.macos-left,
+.macos-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.macos-apple {
+  font-size: 15px;
+  margin-right: 4px;
+}
+
+.macos-item {
+  cursor: default;
+  opacity: 0.8;
+}
+
+.macos-item:hover {
+  opacity: 1;
+}
+
+.macos-active {
+  font-weight: 600;
+  opacity: 1;
+}
+
+.macos-icon {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.macos-time {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* MP4 window layout */
+.window-mp4 {
+  width: 70vw;
+  height: 70vh;
+  top: 12%;
+}
+
+/* Let the body be a clean edge-to-edge video area */
+.window-mp4 .window-body {
+  flex: 1;
+  padding: 0;           /* no inner padding */
+  margin: 0;
+  background: #000;
+  overflow: hidden;
+  display: flex;        /* so child can flex to full size */
+}
+
+/* Container fills the body */
+.window-mp4 .video-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+}
+
+/* Video fills container & crops nicely */
+.window-mp4 .video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* or 'contain' if you want full frame with letterbox */
+  display: block;
+}
+
+
+
+.window-md li {
+  margin-left: 3%;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Subtle grey underline */
+.window-md .window-body h1::after,
+.window-md .window-body h2::after,
+.window-md .window-body h3::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(0, 0, 0, 0.12); /* soft grey line */
+}
+
+.boilerroom-img-1 .boilerroom-img-2 .boilerroom-img-3 {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boilerroom-img-1 video {
+  width: 30%;
+}
+
+.boilerroom-img-1 img {
+  width: 30%;
+}
+
+.boilerroom-img-2 img {
+  width: 90%;
+}
+
+.boilerroom-img-2 video {
+  width: 90%;
+}
+
+.boilerroom-img-3 img {
+  width: 45%;
+}
+
+.videojs2 {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  max-width: 100vw;
+  position: relative;
+  padding: 6vh 0 0 0;
+}
+
+
+.videojs2 img {
+  height: 47%;
+  width: 47%;
+  object-fit: contain;
+  position: relative;
+  justify-content: center;
+}
+
+.videojs2 video {
+  height: 47%;
+  width: 47%;
+  object-fit: contain;
+  position: relative;
+  justify-content: center;
+}
+
+.videojs1 {
+  display: flex;
+
+  max-width: 100vw;
+  position: relative;
+  padding: 6vh 0 0 0;
+}
+
+.videojs1 video {
+  height: 80%;
+  width: 80%;
+  object-fit: contain;
+  position: relative;
+  justify-content: center;
+}
+
+.desktop-icon {
+  position: fixed;
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  user-select: none;
+  z-index: 10;
+}
+
+/* Portfolio app position (top-right like you had) */
+#portfolio-app-icon {
+  top: 80px;
+  right: 80px;
+}
+
+/* Trash position (bottom-right like macOS) */
+#trash-bin {
+  right: 24px;
+  bottom: 24px;
+}
+
+
+
+.desktop-bin {
+  position: fixed;
+  top: 80px;
+  left: 80px;
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  cursor: default;
+  user-select: none;
+  z-index: 10;
+}
+
+.desktop-icon-image {
+  width: 85px;
+  height: 85px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.6);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+  background-image: url("public/img/IMG_1538.jpeg"); /* or custom app icon */
+  background-size: cover;
+  background-position: center;
+}
+
+
+.desktop-icon-label {
+  font-size: 12px;
+  color: #ffffff;
+  text-shadow: 0 0 4px rgba(0,0,0,0.9);
+}
+
+.desktop-icon.hidden {
+  display: none;
+}
+
+.bin-icon-image {
+  width: 85px;
+  height: 85px;
+  border-radius: 14px;
+  /* background: rgba(0,0,0,0.45); */
+  /* box-shadow: 0 10px 25px rgba(0,0,0,0.7); */
+  background-image: url("public/img/trash.png"); /* <- change to your trash icon asset */
+  background-size: cover;
+  background-position: center;
+}
+
+#trash-bin.trash-hover .bin-icon-image {
+  filter: brightness(1.15);
+  transform: scale(1.03);
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+#trash-bin .bin-icon-image {
+  transition: transform 120ms ease, filter 120ms ease;
+}
+
+/* Desktop trash positioning */
+.desktop-trash{
+  top: auto;
+  right: 80px;
+  bottom: 80px;
+}
+
+/* Optional: nicer drag feedback */
+.desktop-icon.is-dragging{
+  cursor: grabbing;
+}
+
+/* ===== Windows 98 modal ===== */
+
+.win98-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: grid;
+  place-items: center;
+  z-index: 99999999;
+}
+
+/* classic Win98 window */
+.win98-window {
+  width: min(620px, calc(100vw - 30px));
+  background: #c0c0c0;
+  color: #000;
+  border: 2px solid #000;
+  box-shadow:
+    2px 2px 0 #000; /* chunky shadow */
+  font-family: "MS Sans Serif", Tahoma, Verdana, sans-serif;
+  font-size: 13px;
+}
+
+/* title bar */
+.win98-titlebar {
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 3px 2px 6px;
+  background: #000080; /* Win98 blue */
+  color: #fff;
+}
+
+.win98-title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* close button (bevel) */
+.win98-close {
+  width: 22px;
+  height: 20px;
+  background: #c0c0c0;
+  color: #000;
+  border: 2px solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 14px;
+  cursor: pointer;
+}
+
+.win98-close:active {
+  border-color: #404040 #ffffff #ffffff #404040;
+}
+
+/* body */
+.win98-body {
+  padding: 12px 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.win98-content {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+/* classic error icon placeholder (red circle w/ x) */
+.win98-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at 35% 35%, #ffb3b3, #ff1a1a);
+  border: 1px solid #000;
+  position: relative;
+}
+
+.win98-icon::before,
+.win98-icon::after {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 15px;
+  width: 18px;
+  height: 2px;
+  background: #fff;
+  transform-origin: center;
+}
+.win98-icon::before { transform: rotate(45deg); }
+.win98-icon::after  { transform: rotate(-45deg); }
+
+.win98-msg {
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.win98-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Win98 button bevel */
+.win98-btn {
+  min-width: 78px;
+  padding: 4px 10px;
+  background: #c0c0c0;
+  border: 2px solid;
+  border-color: #ffffff #404040 #404040 #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.win98-btn:active {
+  border-color: #404040 #ffffff #ffffff #404040;
+}
+
+/* ===== Clippy block ===== */
+.win98-clippy {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.win98-clippy-img {
+  width: 150px;
+  height: auto;
+}
+
+/* Speech bubble, Win98-ish */
+.win98-bubble {
+  max-width: 400px;
+  background: #ffffe1; /* classic yellow help bubble */
+  border: 1px solid #000;
+  padding: 8px 10px;
+  line-height: 1.25;
+  position: relative;
+  font-size: 19px;
+}
+
+/* bubble tail */
+.win98-bubble::after {
+  content: "";
+  position: absolute;
+  right: -7px;
+  bottom: 14px;
+  width: 12px;
+  height: 12px;
+  background: #ffffe1;
+  border-right: 1px solid #000;
+  border-bottom: 1px solid #000;
+  transform: rotate(-45deg);
+}
+

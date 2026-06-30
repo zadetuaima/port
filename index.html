@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Zade Tuaima Portfolio</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon" />
+  </head>
+  <body>
+    <!-- macOS-style system bar -->
+    <div class="macos-bar">
+      <div class="macos-left">
+        <span class="macos-apple"></span>
+        <span class="macos-item macos-active">Zade</span>
+      </div>
+      <div class="macos-right">
+        <span class="macos-time"></span>
+      </div>
+    </div>
+    <main>
+      
+      <div class="main">
+        <div class="desktop-icon" id="portfolio-app-icon">
+          <div class="desktop-icon-image"></div>
+          <div class="desktop-icon-label">portfolio.app</div>
+        </div>
+        <div class="desktop-icon desktop-trash" id="trash-bin">
+          <div class="bin-icon-image"></div>
+          <div class="desktop-icon-label">Trash</div>
+        </div>
+        <div class="main_img"></div>
+        <div class="intro">
+          <div class="terminal-window terminal-window-left">
+            <div class="terminal-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="terminal-title">zade@tuaima — ~/welcome</span>
+            </div>
+            <div class="terminal-body intro_con">
+              <div class="zade no-type">
+                <h3 style="color:#33FF33;">zade@tuaima </h3>
+                <h3 style="color:#f0f;"> ~/welcome</h3>
+              </div>
+
+              <p>$ cat intro.txt</p>
+              <p>Welcome to my portfolio!</p>
+
+              <div class="zade no-type">
+                <p style="color:#33FF33;">zade@tuaima </p>
+                <p style="color:#f0f;"> ~/welcome</p>
+              </div>
+
+              <p>$ ls</p>
+              <p id="ls-line">/projects     stuff_ive_built.js      skills.txt       contact_me.txt     cv.pdf</p>
+            </div>
+          </div>
+        </div>
+        <div class="right">
+          <!-- TOP-RIGHT: ABOUT TERMINAL -->
+          <div class="terminal-window side-terminal side-terminal-top">
+            <div class="terminal-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="terminal-title">about-zade — ~/</span>
+            </div>
+            <div class="terminal-body about_con terminal-body-topright">
+              <div class="zade about-no-type">
+                <span style="color:#33FF33;">zade@tuaima </span>
+                <span style="color:#f0f;"> ~/</span>
+              </div>
+
+              <p>$ cat about_me.txt</p>
+
+              <p>
+                Hi, I’m Zade! lalalalalalalalala lalala lalalalalalalala. Lalalala lalalalala alala lalalalaal. alal? lalalal!
+                
+                <!--I specialise in wearable tech/sensors, Internet of Things devices
+                and embedded devices, if its anything electronics based I’ve got you covered.
+                From memorable devices to installation work I believe novel experiences through
+                hardware can capture customer retention and help form a more meaningful connection
+                with a brand, compared to say glancing at an advert. With the size and power of
+                modern day hardware, anything is possible, enabling experiences that feel
+                innovative, personal, and unforgettable.-->
+              </p>
+            </div>
+          </div>
+
+          <!-- BOTTOM-RIGHT: ACTIVITY / LOG TERMINAL -->
+          <div class="terminal-window side-terminal side-terminal-bottom">
+            <div class="terminal-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <span class="terminal-title">activity-log — ~/welcome</span>
+            </div>
+            <div class="terminal-body log_con">
+              <!-- Commands & actions will be printed here dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HIDDEN CONTENT USED FOR NON-3D POPUPS -->
+      <div id="file-contents" aria-hidden="true">
+        <section id="projects-content" class="file-content">
+          <h2>Projects</h2>
+          <p>Some hardware & IoT builds I’ve worked on:</p>
+          <ul>
+            <li>Wearable XYZ – sensor-driven installation for ...</li>
+            <li>Connected device ABC – prototyped with ...</li>
+          </ul>
+        </section>
+
+        <section id="stuff-content" class="file-content">
+          <h2>Stuff I’ve Built</h2>
+          <p>Short punchy blurbs, maybe code-format style, etc.</p>
+        </section>
+
+        <section id="skills-content" class="file-content skills-content">
+          <h2>Skills</h2>
+          <ul>
+            <li>Embedded Systems Design</li>
+            <li>Firmware Development</li>
+            <li>PCB design & prototyping</li>
+            <li>Back End (C, C++, Python)</li>
+            <li>Front End (HTML, CSS, JS)</li>
+          </ul>
+        </section>
+
+        <section id="pdf-content" class="file-content pdf-content">
+          <embed src="creativecvfinalfinal.pdf" width="auto" height="auto" />
+        </section>
+
+        <section id="contact-content" class="file-content">
+          <h2>Contact Me</h2>
+          <p>Email: you@domain.com</p>
+          <p>LinkedIn: yourprofile</p>
+        </section>
+
+        <section id="project-wearable-xyz" class="file-content">
+          <div class="background-roblox-center">
+            <div class="background-roblox"></div>
+
+          </div>
+            <div class="boilerroom-img-2">
+              <div style="padding:56.3% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1095654415?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="video12"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+            </div> 
+          
+        </section>
+
+
+
+        <section id="boilerroom" class="file-content">
+          <h1>Bristol Boilerroom Takeover</h1>
+          <p>In April 2023, I was invited to curate the Bristol Boilerroom at SWX. We brought with us a host of up-and-coming talent, delving into the brief of 'DIY', where I worked to create a stack of 8 custom CRT oscilloscopes along with a circuit bent video processor providing visuals all in synchronisation with the DJ's.</p>
+          <div class="boilerroom-img-1">
+            <video autoplay controls muted loop src="/public/boilerroom/IMG_067823.mp4"></video>
+            <video autoplay controls muted loop src="/public/boilerroom/output1.mp4"></video>
+            <img src="/public/boilerroom/asset37.jpeg" alt="">
+          </div>
+          <h3 style="color: black;">Video Processor</h3>
+          <p>The circuit bent video processor was built by short circuiting the circuit board, creating new electrical pathways that resulted in the processor creating glitchy iridescent visuals. Many of these visuals may be rather tame, like a blur or slight colour change, but combined they can create vibrant colours and stable distortions which result in something quite beautiful. A vacrol, a simple combination of an LDR and LED, was also placed in the circuit so the visuals could be controlled via an audio input to make the visuals audio reactive, one for both low and high frequencies as seen below. </p>
+          <div class="boilerroom-img-1">
+            <video autoplay controls muted loop src="/public/boilerroom/output5.mp4"></video>
+            <img src="/public/boilerroom/asset15.jpg"></video>
+            <video autoplay controls muted loop src="/public/boilerroom/output6.mp4">
+          </div>
+          
+          <h3 style="color: black;">Custom CRT Oscilloscope</h3>
+          <p>The modified CRT TVs work by hijacking the video signal inputs to the cathode ray tube. Instead of normal scan signals, the vertical input receives an amplified audio signal, causing the screen to display the sound wave as a visual pattern. A small magnet disperses the electrons, splitting the wave into RGB components, while a digital amplifier boosts the audio with accessible input jacks on the back of the TV.</p>
+
+          <div class="boilerroom-img-1">
+            <img src="/public/boilerroom/asset35.jpeg">
+            <img src="/public/boilerroom/asset36.jpeg">
+            <img src="/public/boilerroom/asset34.jpeg">
+          </div>
+          <div class="boilerroom-img-2">
+            <img src="/public/boilerroom/boielrroomdiagram.png">
+          </div>
+          <h3>Outcome</h3>
+          <p>Altogether the project was a success, with no technical difficulties during the night as a result of extensive testing of the equipment and thorough logistical planning beforehand, staying within budget despite the complexity of the equipment needed.</p>
+
+        </section>
+
+        <section id="k22" class="file-content">
+          <h1>The Kaleidoscope 2021</h1>
+          <p>The Kaleidoscope 2021 was the second edition of our festival, bringing our iconic maze layout to the forefront of the event. Working in a team of 3 as the Site Manager, we filled with 2 stages and 6 different art areas curated by ourselves and friends, the 2 day event hosted live musicians, workshops, talks and the freshest DJ's from the UK's electronic music scene.</p>
+          <div class="boilerroom-img-1">
+            <img src="/public/img/asset11.jpg" alt="">
+            <img src="/public/img/asset12.jpg" alt="">
+            <img src="/public/img/asset5.jpeg" alt="">
+          </div>
+          <div class="boilerroom-img-2">
+            <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1136528240?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="video17"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+          </div>
+          <h3>Process</h3>
+          <p>Built over a week, we constructed the maze with 300 fencing panels adorned with artwork ready for the 400 person crowd, battling rain and hail to make the event a success. Working on a budget and with limited professional experience I had to learn a multitude of new skills, including:</p>
+          <li>Power Distribution</li>
+          <li>DMX</li>
+          <li>Audio equipment setup</li>
+          <li style="padding-bottom: 20px;">Crowd management</li>
+          <div class="boilerroom-img-3">
+            <img src="/public/img/asset32.jpg" alt="">
+            <img src="/public/img/asset25.jpg" alt="">
+          </div>
+          <div class="boilerroom-img-1">
+            <img src="/public/img/asset33.jpg" alt="">
+            <img src="/public/img/asset26.jpg" alt="">
+            <img src="/public/img/asset29.jpg" alt="">
+          </div>
+          <h3>Outcome</h3>
+          <p>The event was a massive learning experience, dealing with a variety of issues including power limitations and poor medical staff. This taught us so much going forward with other events, but also showed that doing an event of this scale is possible. Whilst things did go wrong we were always able to resolve them in a timely manner and without indicating to the attendees that something was going wrong.</p>
+        </section>
+
+        <section id="k23" class="file-content">
+          <h1>The Kaleidoscope 2022</h1>
+          <p>The third edition of our intimate 500 capacity festival in the heart of the Wiltshire countryside. Our biggest lineup yet, featuring DJs from across the spectrum of the electronic music scene, including Dr Banana, LUXE, Riz La Teef, Papa Nugs, Napes, DJ Love and Sophia Violet. Our two main stages were hand built, with one being converted from a disused school bus. We also invited our good friends at Aurora Sound to host their own stage spotlighting their network of female, non-binary and LGBTQ+ talent.</p>
+          <div class="boilerroom-img-2">
+            <div style="padding:56.3% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1136535233?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="video12"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+          </div>
+          <div class="boilerroom-img-1">
+            <img src="/public/img/asset17.jpg" alt="">
+            <img src="/public/img/asset18.jpg" alt="">
+            <img src="/public/img/asset19.jpg" alt="">
+          </div>
+          <h3>Process</h3>
+          <p>Hosted on the same site, I built upon the skills I had learnt the previous year leading the team as the festival director prioritising stage/set design and an increased focus on workshops and talent as well as adding a third day. The build this time took 2 weeks and only involved a core team of 3, managing a team of 20 friends lending their expertise from erecting safe structures to sound checks and proper audio setup. Whilst this was the 3rd year, the scale of the event was much larger and with my new role this meant longer hours and more work due to applying for a festival license that we previously did not need. This led to new roles and responsibilities including:</p>
+          <li>Health and safety coordination</li>
+          <li>Liaising with the council/police</li>
+          <li>Local community awareness</li>
+          <li style="padding-bottom: 20px;">Employment/volunteer management</li>
+          <div class="boilerroom-img-1">
+            <img src="/public/img/asset40.jpg" alt="">
+            <img src="/public/img/asset24.jpg" alt="">
+            <img src="/public/img/asset25.png" alt="">
+          </div>
+          <div class="boilerroom-img-3">
+            <img src="/public/img/asset20.jpg" alt="">
+            <img src="/public/img/asset21.jpg" alt="">
+          </div>          
+          <h3>Outcome</h3>
+          <p>The workload meant 20+ hour days during the event, however we managed to succeed in ensuring the festival ran smoothly with no incidences of power shutting off or people getting injured. The final night brought a torrential thunderstorm, something which we had not anticipated with the weather forecasting. This led to the site being partially flooded and meant we had to think on our feet to waterproof sections we did not anticipate would need waterproofing, eventually managing to ensure all the sound equipment was watertight through tarps, tents and elevating amplifiers. Whilst it proved extremely stressful achieving this, it meant a very memorable night for the attendees, providing a background of techno and lightning to end the 3 days.</p>
+        </section>
+
+
+
+        <section id="project-installation-sensors" class="file-content">
+          <h2>Interactive Music Video</h2>
+          <p>A project where me and a team of two had to create a music video in Unreal Engine and "Interactify" it by any means possible</p>
+          <br>
+          <p>We chose "HUMBLE" by Kendrick Lamar, with many memories of listening to this song in house parties when I was 17, we aimed to recreate this within a fever dream-esque world of colour and intoxication.</p>
+          <br>
+          <div class="boilerroom-img-2">
+            <div style="padding:56.3% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1156462892?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="video12"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+          </div>
+          <br>
+          <p>To add interactivity to the project I built 4x ESP32 modules with 9-axis gyroscopes, creating a crude motion capture system which sent raw data straight into unreal. This allowed the user to control the arms of the model and interact with the environment.</p>
+          <br>
+          <div class="boilerroom-img-3">
+            <img src="/public/img/image_ESP_build.jpg" alt="">
+            <img src="/public/img/asset21.jpg" alt="">
+          </div>
+          <div class="boilerroom-img-2">
+            <div style="padding:56.3% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/1156469253?badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="video12"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+          </div>             
+        </section>
+
+
+        <section id="printers" class="file-content">
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls src="Printers_render.mov"></video>
+          </div>
+        </section>
+        <section id="musicai" class="musicai">
+          <div class="video-container">
+            <video autoplay muted loop playsinline controls src="MusicAI_Gen_Thing.mp4"></video>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Main logic + 3D integration -->
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>
