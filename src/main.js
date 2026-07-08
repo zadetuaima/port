@@ -4,6 +4,12 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 /* ===================== 3D "Stuff I've Built" ===================== */
 let zCounter = 1000; // for stacking terminals + popups
 
+// Coarse-pointer / small-screen detection. Used to switch from the
+// floating-window desktop metaphor to a stacked, touch-friendly layout.
+const IS_MOBILE =
+  window.matchMedia("(max-width: 768px)").matches ||
+  window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
 /* =========================================================
    Terminal + Popup Logic
    ========================================================= */
@@ -52,6 +58,8 @@ function ensureFixedPosition(win) {
 
 function snapTerminalPopupToTop(win) {
   if (!isTerminalPopup(win)) return;
+  // On mobile, popups are full-screen modals — no docking/snapping.
+  if (IS_MOBILE) return;
 
   ensureFixedPosition(win);
 
@@ -89,11 +97,15 @@ function initStuffIveBuilt(root) {
 
   const { width, height } = getSize();
   const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
-  camera.position.set(-0.5, 1, 4);
+  camera.position.set(0, 1.2, 7.5);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(width, height);
-  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  // Cap DPR: phones often report 3x, which tanks perf on a WebGL scene.
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // Let our custom drag-to-rotate own touch gestures instead of the page
+  // scrolling/zooming underneath the canvas.
+  renderer.domElement.style.touchAction = "none";
   root.appendChild(renderer.domElement);
 
   // ------------ lights ------------
@@ -133,11 +145,11 @@ function initStuffIveBuilt(root) {
           </div>
           <p>Custom audio-reactive mixer build tuned for tactile live demos and physical interfaces.</p>
           <div class="videojs1">
-            <video autoplay controls muted loop src="/public/videos/IMG_1525.mov"></video>
+            <video autoplay controls muted loop src="/public/videos/IMG_1525.mp4"></video>
           </div>
           <div class="videojs2">
             <img src="/public/img/IMG_1538.jpeg">
-            <video autoplay controls muted loop src="/public/videos/ProCameraVideoFile.mov"></video>
+            <video autoplay controls muted loop src="/public/videos/ProCameraVideoFile.mp4"></video>
           </div>
         </div>
 
@@ -242,6 +254,19 @@ function initStuffIveBuilt(root) {
   const dragCamPos = new THREE.Vector3();
   const dragCamTarget = new THREE.Vector3();
 
+  // screen-space rotation: drag turns the object around the camera's axes
+  const camRight = new THREE.Vector3();
+  const camUp = new THREE.Vector3();
+  const _dragQ = new THREE.Quaternion();
+
+  // post-release spin (inertia), kept in the same screen-space axes as the drag
+  let spinObj = null;
+  const spinUpAxis = new THREE.Vector3();
+  const spinRightAxis = new THREE.Vector3();
+  let spinUpVel = 0;
+  let spinRightVel = 0;
+  const MAX_SPIN = 0.25; // rad/frame cap so a hard flick can't go haywire
+
   const keysPressed = {};
 
   // ------------ helper: highlight edges ------------
@@ -287,17 +312,25 @@ function initStuffIveBuilt(root) {
     scene.add(hb);
     hitBoxes.push(hb);
     boxMap.set(hb, obj);
+
+    // let the bob keep the (invisible) hitbox aligned with the visual mesh
+    obj.userData.hitBox = hb;
+    obj.userData.hbOffsetY = ctr.y - obj.position.y;
   }
 
   // ------------ objects ------------
 
+  // staggered "floating gallery" layout: each object sits at a different
+  // height AND depth so the trio reads as an arrangement, not a flat row.
+  // orientation = upright (no roll), with a gentle 3/4 turn toward the centre.
   const objectConfigs = [
     {
       type: "gltf",
       name: "CRT TV Oscilloscope",
       url: "/models/crtfony.glb",
       scale: 1.5,
-      position: { x: 2.1, y: 0.3, z: 0.8 },
+      position: { x: -2.0, y: 0.45, z: -0.2 },
+      orientation: { x: 0.05, y: 0.45, z: 0 },
       tooltipClass: "obj2",
     },
     {
@@ -305,7 +338,8 @@ function initStuffIveBuilt(root) {
       name: "Mixer",
       url: "/models/Mixer.glb",
       scale: 1.5,
-      position: { x: -0.2, y: 0.3, z: 0.8 },
+      position: { x: 0.15, y: -0.35, z: 1.1 },
+      orientation: { x: 0.04, y: -0.12, z: 0 },
       tooltipClass: "obj1",
     },
     {
@@ -313,13 +347,14 @@ function initStuffIveBuilt(root) {
       name: "Typewriter",
       url: "/models/typewriter3.glb",
       scale: 1.5,
-      position: { x: -2.1, y: 0.2, z: 0.8 },
+      position: { x: 2.0, y: 0.3, z: 0.1 },
+      orientation: { x: 0.04, y: -0.45, z: 0 },
       tooltipClass: "obj3",
     },
   ];
 
   const loader = new GLTFLoader();
-  objectConfigs.forEach((cfg) => {
+  objectConfigs.forEach((cfg, i) => {
     if (cfg.type === "gltf") {
       loader.load(
         cfg.url,
@@ -329,11 +364,16 @@ function initStuffIveBuilt(root) {
           m.scale.set(cfg.scale, cfg.scale, cfg.scale);
           m.position.set(cfg.position.x, cfg.position.y, cfg.position.z);
 
-          const min = -Math.PI / 10;
-          const max = Math.PI / 10;
-          m.rotation.x = Math.random() * Math.PI * 2;
-          m.rotation.y = Math.random() * (max - min) + min;
-          m.rotation.z = Math.random() * Math.PI * 2;
+          // upright, gentle hero angle — no more random tumbling
+          const o = cfg.orientation || { x: 0, y: 0, z: 0 };
+          m.rotation.set(o.x, o.y, o.z);
+
+          // gentle idle bob; distinct phase/speed per object so they drift
+          // independently rather than bobbing in unison
+          m.userData.bobBaseY = cfg.position.y;
+          m.userData.bobPhase = i * 2.1;
+          m.userData.bobSpeed = 0.5 + i * 0.12;
+          m.userData.bobAmp = 0.12;
 
           addRotatable(m, cfg);
         },
@@ -383,7 +423,7 @@ function initStuffIveBuilt(root) {
   }
 
   function resetView() {
-    camera.position.set(0, 2, 7);
+    camera.position.set(0, 1.2, 7.5);
     controls.target.copy(scene.position);
     controls.enableRotate = true;
     controls.enableZoom = false;
@@ -491,7 +531,7 @@ function initStuffIveBuilt(root) {
 
   renderer.domElement.addEventListener("contextmenu", (e) => e.preventDefault());
 
-  renderer.domElement.addEventListener("mousemove", (e) => {
+  renderer.domElement.addEventListener("pointermove", (e) => {
     const rect = renderer.domElement.getBoundingClientRect();
 
     mouseVelX = e.clientX - lastMouseX;
@@ -519,8 +559,17 @@ function initStuffIveBuilt(root) {
       const dx = e.clientX - px;
       const dy = e.clientY - py;
       dragDistance += Math.abs(dx) + Math.abs(dy);
-      dragT.rotation.y += dx * sY;
-      dragT.rotation.x += dy * sX;
+
+      // rotate around the CAMERA's right/up axes (screen space) so the object
+      // always follows the cursor, no matter how it's already oriented.
+      // premultiply applies the spin in world space, not the object's local frame.
+      camRight.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
+      camUp.setFromMatrixColumn(camera.matrixWorld, 1).normalize();
+      _dragQ.setFromAxisAngle(camUp, dx * sY);
+      dragT.quaternion.premultiply(_dragQ);
+      _dragQ.setFromAxisAngle(camRight, dy * sX);
+      dragT.quaternion.premultiply(_dragQ);
+
       dragVelocities.push({ dx, dy, time: performance.now() });
       if (dragVelocities.length > DRAG_VEL_FRAMES) dragVelocities.shift();
       px = e.clientX;
@@ -532,7 +581,7 @@ function initStuffIveBuilt(root) {
     }
   });
 
-  renderer.domElement.addEventListener("mousedown", (e) => {
+  renderer.domElement.addEventListener("pointerdown", (e) => {
     if (e.button === 2) return;
     const rect = renderer.domElement.getBoundingClientRect();
     mouse2.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -541,6 +590,10 @@ function initStuffIveBuilt(root) {
     const hits = ray.intersectObjects(hitBoxes, false);
     if (hits.length) {
       dragT = boxMap.get(hits[0].object);
+      // stop any inertial spin so you grab the object cleanly
+      spinObj = null;
+      spinUpVel = 0;
+      spinRightVel = 0;
       px = e.clientX;
       py = e.clientY;
       dragDistance = 0;
@@ -554,20 +607,27 @@ function initStuffIveBuilt(root) {
     }
   });
 
-  document.addEventListener("mouseup", () => {
+  const onPointerUp = () => {
     if (dragT && dragDistance > DRAG_THRESHOLD) {
       wasDownOnObject = true;
       if (dragVelocities.length > 1) {
-        const last = dragVelocities[dragVelocities.length - 1];
+        // average the recent drag speed and let the object keep spinning that
+        // way, around the same screen-space axes the drag used.
+        let sumdx = 0, sumdy = 0;
+        for (const d of dragVelocities) { sumdx += d.dx; sumdy += d.dy; }
         const first = dragVelocities[0];
-        const dt = (last.time - first.time) || 1;
-        const ddx = last.dx - first.dx;
-        const ddy = last.dy - first.dy;
-        const vx = -((ddx / dt) * sX * 16);
-        const vy = -((ddy / dt) * sY * 16);
+        const last = dragVelocities[dragVelocities.length - 1];
+        const dt = (last.time - first.time) || 16;
+
+        spinObj = dragT;
+        spinUpAxis.copy(camUp);
+        spinRightAxis.copy(camRight);
+        spinUpVel = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, (sumdx / dt) * sY * 16));
+        spinRightVel = Math.max(-MAX_SPIN, Math.min(MAX_SPIN, (sumdy / dt) * sX * 16));
+
+        // make sure the ambient Euler spin doesn't fight the inertia
         const objVel = velocities.get(dragT);
-        objVel.x = vy;
-        objVel.y = vx;
+        if (objVel) objVel.x = objVel.y = objVel.z = 0;
       }
     }
     isDown = false;
@@ -575,7 +635,8 @@ function initStuffIveBuilt(root) {
     dragVelocities = [];
     controls.enabled = true;
     renderer.domElement.classList.remove("dragging");
-  });
+  };
+  document.addEventListener("pointerup", onPointerUp);
 
   renderer.domElement.addEventListener("click", (e) => {
     if (wasDownOnObject) {
@@ -663,39 +724,55 @@ function initStuffIveBuilt(root) {
 
 
   // keyboard panning (WASD, QE) inside popup
-  window.addEventListener("keydown", (e) => {
+  const onKeyDown = (e) => {
     keysPressed[e.key.toLowerCase()] = true;
-  });
-  window.addEventListener("keyup", (e) => {
+  };
+  const onKeyUp = (e) => {
     keysPressed[e.key.toLowerCase()] = false;
-  });
+  };
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 
   // ------------ resize ------------
 
+  let ro = null;
+  const onWindowResize = () => {
+    const { width, height } = getSize();
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  };
   if (window.ResizeObserver) {
-    const ro = new ResizeObserver(() => {
-      const { width, height } = getSize();
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    });
+    ro = new ResizeObserver(onWindowResize);
     ro.observe(root);
   } else {
-    window.addEventListener("resize", () => {
-      const { width, height } = getSize();
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    });
+    window.addEventListener("resize", onWindowResize);
   }
 
   // ------------ animate ------------
 
+  let disposed = false;
+  let rafId = 0;
+
   (function animate() {
-    requestAnimationFrame(animate);
+    if (disposed) return;
+    rafId = requestAnimationFrame(animate);
 
     updateTooltipOffset();
     updateFades();
+
+    // gentle floating bob — paused while focused so the framed object holds still
+    if (!isFocused) {
+      const tb = performance.now() * 0.001;
+      rotatables.forEach((o) => {
+        const baseY = o.userData.bobBaseY;
+        if (baseY === undefined) return;
+        o.position.y =
+          baseY + Math.sin(tb * o.userData.bobSpeed + o.userData.bobPhase) * o.userData.bobAmp;
+        const hb = o.userData.hitBox;
+        if (hb) hb.position.y = o.position.y + o.userData.hbOffsetY;
+      });
+    }
 
     rotatables.forEach((o) => {
       const v = velocities.get(o);
@@ -713,6 +790,20 @@ function initStuffIveBuilt(root) {
         v.z *= friction;
       }
     });
+
+    // post-release spin inertia (screen-space, matches the drag direction)
+    if (spinObj && (Math.abs(spinUpVel) > minVel || Math.abs(spinRightVel) > minVel)) {
+      if (Math.abs(spinUpVel) > minVel) {
+        _dragQ.setFromAxisAngle(spinUpAxis, spinUpVel);
+        spinObj.quaternion.premultiply(_dragQ);
+        spinUpVel *= friction;
+      }
+      if (Math.abs(spinRightVel) > minVel) {
+        _dragQ.setFromAxisAngle(spinRightAxis, spinRightVel);
+        spinObj.quaternion.premultiply(_dragQ);
+        spinRightVel *= friction;
+      }
+    }
 
     const moveSpeed = 0.1;
     if (keysPressed["w"] || keysPressed["arrowup"]) {
@@ -775,6 +866,21 @@ function initStuffIveBuilt(root) {
     controls.update();
     renderer.render(scene, camera);
   })();
+
+  // teardown: stop the render loop, free the WebGL context, detach the
+  // global listeners so reopening the popup doesn't stack loops/contexts
+  return function dispose() {
+    if (disposed) return;
+    disposed = true;
+    cancelAnimationFrame(rafId);
+    if (ro) ro.disconnect();
+    window.removeEventListener("resize", onWindowResize);
+    window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("keyup", onKeyUp);
+    document.removeEventListener("pointerup", onPointerUp);
+    controls.dispose();
+    renderer.dispose();
+  };
 }
 
 /* =========================================================
@@ -794,6 +900,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentPath = ROOT_PATH;
   let launchInitiated = false;
   let typeAboutBlock = null;   // we'll assign this later
+  let openTerminalAppMobile = null;   // set by setupMobileHomeScreen() on phones
 
 
   function cdToProjects(onDone) {
@@ -861,7 +968,17 @@ function showTrashError() {
 
   document.body.appendChild(overlay);
 
-  const close = () => overlay.remove();
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    overlay.remove();
+  };
+
+  // ESC closes — listener stays until the dialog actually closes,
+  // then is removed no matter how it was dismissed
+  const onKey = (e) => {
+    if (e.key === "Escape") close();
+  };
+  document.addEventListener("keydown", onKey);
 
   overlay.querySelector('.win98-ok')?.addEventListener('click', close);
   overlay.querySelector('.win98-close')?.addEventListener('click', close);
@@ -870,12 +987,6 @@ function showTrashError() {
   overlay.addEventListener("mousedown", (e) => {
     if (e.target === overlay) close();
   });
-
-  // ESC closes (optional)
-  const onKey = (e) => {
-    if (e.key === "Escape") close();
-  };
-  document.addEventListener("keydown", onKey, { once: true });
 }
 
 
@@ -903,7 +1014,6 @@ function showTrashError() {
 
   const fileToSectionId = {
     "skills.txt": "skills-content",
-    "skills.txt": "skills-content",
     "contact_me.txt": "contact-content",
     "cv.pdf":"pdf-content",
   };
@@ -913,8 +1023,8 @@ function showTrashError() {
     { name: "HEX EDA_A-Land-Unfinished.md", sectionId: "project-wearable-xyz" },
     { name: "HEX interactive_music_video_umg.md", sectionId: "project-installation-sensors" },
     { name: "Wax Palace boilerroom_takeover.md", sectionId: "boilerroom" },
-    { name: "The_Kaleidocsope_Festival_2022.md", sectionId: "k23" },
-    { name: "The_Kaleidocsope_Festival_2021.md", sectionId: "k22" },
+    { name: "The_Kaleidocsope_Festival_2022.html", sectionId: "k23" },
+    { name: "The_Kaleidocsope_Festival_2021.html", sectionId: "k22" },
     { name: "printers.mp4", sectionId: "printers" },
     { name: "musicai.mp4", sectionId: "musicai" },
 
@@ -1217,7 +1327,7 @@ function renderDirectoryListingLeft(files) {
   function openPopup(title, section) {
   const isTextFile = /\.txt$/i.test(title);
   const isMP4File = /\.mp4$/i.test(title);
-  const isMDFile = /\.md$/i.test(title);
+  const isMDFile = /\.(md|html)$/i.test(title);
   const isjsFile = /\.js$/i.test(title);
   const ispdfFile = /\.pdf$/i.test(title);
 
@@ -1229,6 +1339,7 @@ function renderDirectoryListingLeft(files) {
   if (isMDFile) win.classList.add("window-md");
   if (isjsFile) win.classList.add("window-js");
   if (ispdfFile) win.classList.add("window-pdf");
+  if (section && section.id) win.classList.add("win-" + section.id);
 
   win.innerHTML = `
     <div class="window-header">
@@ -1244,6 +1355,7 @@ function renderDirectoryListingLeft(files) {
   `;
 
   document.body.appendChild(win);
+  document.body.classList.add("modal-open");
   makeDraggable(win);      // handles initial z-index + drag rules
 
   // trigger opening animation
@@ -1274,6 +1386,7 @@ function renderDirectoryListingLeft(files) {
   `;
 
   document.body.appendChild(win);
+  document.body.classList.add("modal-open");
   makeDraggable(win);    // will mark as terminal popup & apply rules
 
   void win.offsetWidth;
@@ -1282,12 +1395,17 @@ function renderDirectoryListingLeft(files) {
   attachCloseHandlers(win)
 
   const root = win.querySelector("#stuff-ive-buit-root");
-  initStuffIveBuilt(root);
+  win.cleanup3D = initStuffIveBuilt(root);
 }
 
 
   function closeWindowWithAnimation(win) {
+    if (typeof win.cleanup3D === "function") {
+      win.cleanup3D(); // stop 3D render loop + free WebGL context
+      win.cleanup3D = null;
+    }
     win.classList.remove("show");
+    document.body.classList.remove("modal-open");
     setTimeout(() => {
       if (win && win.parentNode) win.parentNode.removeChild(win);
     }, 200);
@@ -1297,9 +1415,6 @@ function renderDirectoryListingLeft(files) {
     const existing = document.querySelector(".window");
     if (existing) closeWindowWithAnimation(existing);
   }
-
-  const DRAG_START_THRESHOLD = 3; // pixels before we treat it as a drag
-
 
 const MACOS_BAR_HEIGHT = 32; // matches your .macos-bar height
 
@@ -1476,11 +1591,6 @@ function onUp() {
   const appIcon = document.getElementById("portfolio-app-icon");
   const trashBin = document.getElementById("trash-bin");
 
-  function blueHighlight() {
-    
-  }
-
-
   function showWindow(win, delay) {
     if (!win) return;
     setTimeout(() => {
@@ -1507,14 +1617,21 @@ function onUp() {
     const aboutTerm = document.querySelector(".side-terminal-top");
     const logTerm   = document.querySelector(".side-terminal-bottom");
 
-    showWindow(leftTerm, 60);
-    showWindow(aboutTerm, 1000);
-    showWindow(logTerm, 350);
+    if (IS_MOBILE) {
+      // Phones: the two panes already live inside #ios-terminal-app (built by
+      // setupMobileHomeScreen). Just drop the activity log and zoom the app open.
+      if (logTerm) logTerm.style.display = "none";
+      if (typeof openTerminalAppMobile === "function") openTerminalAppMobile();
+    } else {
+      showWindow(leftTerm, 60);
+      showWindow(aboutTerm, 1000);
+      showWindow(logTerm, 350);
 
-    // 👇 initial log prompt at ~/welcome
-    setTimeout(() => {
-      printLogPrompt(currentPath);  // currentPath starts as ROOT_PATH
-    }, 550);
+      // 👇 initial log prompt at ~/welcome
+      setTimeout(() => {
+        printLogPrompt(currentPath);  // currentPath starts as ROOT_PATH
+      }, 550);
+    }
 
     setTimeout(() => {
       typeBlock(0);
@@ -1523,7 +1640,7 @@ function onUp() {
       }
     }, 50);
 
-    if (appIcon) {
+    if (appIcon && !IS_MOBILE) {
       appIcon.style.zIndex = "1";
     }
   }
@@ -1640,9 +1757,148 @@ function onUp() {
 
 
 
+  /* ===================== iOS HOME SCREEN (mobile) =====================
+     Turns the desktop into an iOS-style springboard: one Portfolio app icon
+     on the wallpaper. Tap → zoom-opens a full-screen terminal "app" that is
+     a top/bottom split (top = ~/welcome + files, bottom = about). Long-press
+     → jiggle/edit mode: drag to reposition, ✕ badge fires the Clippy gag. */
+  function setupMobileHomeScreen() {
+    const leftTerm  = document.querySelector(".terminal-window-left");
+    const aboutTerm = document.querySelector(".side-terminal-top");
+    const logTerm   = document.querySelector(".side-terminal-bottom");
+
+    const barH = (document.querySelector(".macos-bar")?.offsetHeight) || 30;
+
+    // Build the full-screen terminal app surface with two stacked panes.
+    const app = document.createElement("div");
+    app.id = "ios-terminal-app";
+    app.style.top = barH + "px";
+    app.innerHTML = `
+      <div class="ios-app-bar">
+        <button class="ios-app-home" type="button">&#8249; Home</button>
+        <span class="ios-app-title">portfolio — zade@tuaima</span>
+      </div>
+      <div class="ios-pane-wrap"></div>
+    `;
+    document.body.appendChild(app);
+
+    const paneWrap = app.querySelector(".ios-pane-wrap");
+    if (leftTerm)  paneWrap.appendChild(leftTerm);   // top pane: ~/welcome + files
+    if (aboutTerm) paneWrap.appendChild(aboutTerm);  // bottom pane: about-me
+    if (logTerm)   logTerm.style.display = "none";   // drop the activity log
+
+    // ---- open / close with the iOS "grow out of the icon" zoom ----
+    function setZoomOrigin() {
+      const r = appIcon.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      app.style.transformOrigin = `${cx}px ${cy - barH}px`;
+    }
+    function openTerminalApp() {
+      setZoomOrigin();
+      document.body.classList.add("app-open");
+      requestAnimationFrame(() => app.classList.add("open"));
+    }
+    function closeTerminalApp() {
+      app.classList.remove("open");
+      setTimeout(() => document.body.classList.remove("app-open"), 380);
+    }
+    openTerminalAppMobile = openTerminalApp;  // let launchApp trigger the zoom
+    app.querySelector(".ios-app-home").addEventListener("click", closeTerminalApp);
+
+    function handleAppTap() {
+      if (!launchInitiated) launchApp();   // first open: types content + zooms in
+      else openTerminalApp();              // re-open without retyping
+    }
+
+    // ---- jiggle / edit mode ----
+    let jiggle = false;
+    const doneBtn = document.createElement("button");
+    doneBtn.className = "ios-done";
+    doneBtn.type = "button";
+    doneBtn.textContent = "Done";
+    document.querySelector(".main").appendChild(doneBtn);
+
+    function enterJiggle() {
+      if (jiggle) return;
+      jiggle = true;
+      document.body.classList.add("jiggle-mode");
+    }
+    function exitJiggle() {
+      if (!jiggle) return;
+      jiggle = false;
+      document.body.classList.remove("jiggle-mode");
+    }
+    doneBtn.addEventListener("click", exitJiggle);
+    const wallpaper = document.querySelector(".main_img");
+    if (wallpaper) wallpaper.addEventListener("click", exitJiggle);
+
+    // ✕ delete badge → Clippy "you can't delete my portfolio" gag
+    const badge = document.createElement("span");
+    badge.className = "ios-badge";
+    badge.textContent = "×";
+    appIcon.appendChild(badge);
+    badge.addEventListener("click", (e) => {
+      e.stopPropagation();
+      showTrashError();
+    });
+
+    // ---- tap to open · long-press to jiggle · drag to rearrange ----
+    appIcon.style.touchAction = "none";
+    let startX = 0, startY = 0, baseLeft = 0, baseTop = 0;
+    let moved = false, pid = null, pressTimer = null;
+
+    appIcon.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".ios-badge")) return;   // badge handles its own tap
+      if (typeof e.button === "number" && e.button > 0) return;
+      pid = e.pointerId;
+      moved = false;
+      const r = appIcon.getBoundingClientRect();
+      baseLeft = r.left; baseTop = r.top;
+      startX = e.clientX; startY = e.clientY;
+      try { appIcon.setPointerCapture(pid); } catch (_) {}
+      pressTimer = setTimeout(enterJiggle, 500);    // hold → edit mode
+    });
+
+    appIcon.addEventListener("pointermove", (e) => {
+      if (pid === null) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!moved && dx * dx + dy * dy < 16) return; // ignore micro-jitter
+      moved = true;
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      if (!jiggle) return;                          // only drag while jiggling
+      const pad = 8;
+      let nl = baseLeft + dx;
+      let nt = baseTop + dy;
+      nl = Math.max(pad, Math.min(nl, window.innerWidth - appIcon.offsetWidth - pad));
+      nt = Math.max(barH + 6, Math.min(nt, window.innerHeight - appIcon.offsetHeight - pad));
+      appIcon.style.position = "fixed";
+      appIcon.style.right = "auto";
+      appIcon.style.bottom = "auto";
+      appIcon.style.left = nl + "px";
+      appIcon.style.top = nt + "px";
+    });
+
+    function endPress() {
+      if (pid === null) return;
+      if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; }
+      try { appIcon.releasePointerCapture(pid); } catch (_) {}
+      const wasTap = !moved;
+      pid = null;
+      if (wasTap && !jiggle) handleAppTap();        // clean tap opens the app
+    }
+    appIcon.addEventListener("pointerup", endPress);
+    appIcon.addEventListener("pointercancel", endPress);
+  }
+
   if (appIcon) {
-    makeIconDraggable(appIcon);          // 👈 make it draggable
-    appIcon.addEventListener("dblclick", launchApp);  // mac-style launch
+    if (IS_MOBILE) {
+      setupMobileHomeScreen();
+    } else {
+      makeIconDraggable(appIcon);                       // free-drag desktop icon
+      appIcon.addEventListener("dblclick", launchApp);  // mac-style launch
+    }
   } else {
     // Fallback behaviour if icon doesn't exist (dev mode)
     typeBlock(0);
