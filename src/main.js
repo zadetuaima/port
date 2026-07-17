@@ -1041,7 +1041,7 @@ function showTrashError() {
         <div class="win98-bubble">
             Hi, I've been resurrected from Windows 98!<br>
             It looks like you're trying to delete Zade's portfolio.<br>
-            Maybe like don't be thick and idk…… don’t?
+            Maybe like don't do thay?
           </div>
             <img class="win98-clippy-img" src="/public/img/clippy.png" alt="Clippy">
           </div>

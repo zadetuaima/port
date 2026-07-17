@@ -1316,7 +1316,7 @@ p {
 }
 
 /* understated retro hit counter at the bottom */
-.win-k22 .window-body::after,
+/* .win-k22 .window-body::after,
 .win-k23 .window-body::after {
   content: "\1F441 visitors: 001337";
   display: inline-block;
@@ -1328,7 +1328,7 @@ p {
   letter-spacing: 2px;
   padding: 4px 9px;
   border: 1px inset #888;
-}
+} */
 
 .win-k22 .window-body h1,
 .win-k23 .window-body h1 {
