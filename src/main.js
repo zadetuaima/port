@@ -163,13 +163,16 @@ function initStuffIveBuilt(root) {
               Keep texture visible
             </label>
           </div>
-          <p>Custom audio-reactive mixer build tuned for tactile live demos and physical interfaces.</p>
+          <p>Circuit bent 1980's video processor, mixing video and sync signals to provide iridescent and glitchy visuals. Audio signals also injected using a vactrol.</p>
           <div class="videojs1">
             <video autoplay controls muted loop src="/public/videos/IMG_1525.mp4"></video>
           </div>
           <div class="videojs2">
             <img src="/public/img/IMG_1538.jpeg">
             <video autoplay controls muted loop src="/public/videos/ProCameraVideoFile.mp4"></video>
+          </div>
+          <div class="videojs1">
+            <img src="/public/img/IMG_0680.jpeg">
           </div>
         </div>
 
@@ -181,7 +184,7 @@ function initStuffIveBuilt(root) {
               Keep texture visible
             </label>
           </div>
-          <p>Vintage CRT driven as an oscilloscope-style audio visualiser. Analog aesthetics, digital control.</p>
+          <p>CRT TV reworked as an oscilloscope. External audio injected to produce audio waveforms.</p>
           <div class="boilerroom-img-2">
             <video autoplay controls muted loop src="/public/videos/CRTTVVid.mp4"></video>
           </div>        
@@ -195,7 +198,7 @@ function initStuffIveBuilt(root) {
               Keep texture visible
             </label>
           </div>
-          <p>A sensorised typewriter outputting MIDI-like events; each keypress becomes a performance.</p>
+          <p></p>
           <div class="boilerroom-img-2">
             <video autoplay controls muted loop src="/public/videos/MicrosoftTeams-video.mp4"></video>
           </div>
