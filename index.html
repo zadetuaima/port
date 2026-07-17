@@ -76,13 +76,13 @@
               <p>$ cat about_me.txt</p>
 
               <p>
-                Hi, I’m Zade! I specialise in wearable tech/sensors, Internet of Things devices
-                and embedded devices, if its anything electronics based I’ve got you covered.
-                From memorable devices to installation work I believe novel experiences through
-                hardware can capture customer retention and help form a more meaningful connection
-                with a brand, compared to say glancing at an advert. With the size and power of
-                modern day hardware, anything is possible, enabling experiences that feel
-                innovative, personal, and unforgettable.
+                Hi, I'm Zade! I specialise in wearable tech/sensors, IoT and embedded devices, 
+                if it's anything electronics based, I've got you covered. I think with my hands, 
+                turning ambiguous ideas into prototypes fast, across code, PCBs, 3D printing and 
+                whatever the idea needs next. I believe playful hardware forms deeper, more 
+                meaningful connections than any screen alone, and with the size and power of 
+                modern hardware, anything is possible, providing experiences that feel innovative, 
+                personal, and unforgettable.
               </p>
             </div>
           </div>
@@ -335,6 +335,85 @@
         <section id="musicai" class="musicai">
           <div class="video-container">
             <video autoplay muted loop playsinline controls src="MusicAI_Gen_Thing.mp4"></video>
+          </div>
+        </section>
+
+        <section id="bibigo" class="file-content bibigo-content">
+          <div class="bibigo-meta">
+            <span class="bibigo-tag">Hardware / IoT — 2025</span>
+            <span class="bibigo-spec">nRF52 · BLE HID</span>
+          </div>
+          <h1>HEX Bibigo Scroll</h1>
+          <p class="bibigo-intro">A scrollable chopstick that turns idle dinner-time doom-scrolling into a one-handed, one-utensil ritual — flick to scroll, tap to like, no second hand required.</p>
+
+          <div class="bibigo-cols">
+            <div><div class="bibigo-label">The problem</div><p>Eating noodles and scrolling shorts both want your hands — you only have two.</p></div>
+            <div><div class="bibigo-label">The build</div><p>A nRF52-based BLE controller, 3D-printed into a working chopstick shell, driven by flick gestures.</p></div>
+            <div><div class="bibigo-label">Functions</div><p>Scroll, like, and flip scroll-direction — all from one utensil paired to your phone.</p></div>
+          </div>
+
+          <div class="bibigo-hero">
+            <img src="/public/bibigo/chopstick.png" alt="3D printed chopstick prototype with nRF52 board">
+          </div>
+          <div class="bibigo-pair">
+            <div><img src="/public/bibigo/pcb.jpg" alt="PCB layout of the chopstick board"></div>
+            <div><video autoplay muted loop playsinline src="/public/bibigo/media1.mp4"></video></div>
+          </div>
+          <div class="bibigo-full">
+            <video autoplay muted loop playsinline controls src="/public/bibigo/media2.mp4"></video>
+          </div>
+          <p class="bibigo-caption">In-hand demo — flick-to-scroll gesture</p>
+        </section>
+
+        <section id="hex-action-audio" class="file-content bibigo-content">
+          <div class="bibigo-meta">
+            <span class="bibigo-tag">Accessibility / Sports Tech — Wimbledon 2026</span>
+            <span class="bibigo-spec">Computer Vision · 3D Audio</span>
+          </div>
+          <h1>HEX Action Audio</h1>
+          <p class="bibigo-intro">A system that turns live tennis into information-rich 3D sound, helping blind and low-vision audiences follow the action in real time.</p>
+
+          <div class="bibigo-cols">
+            <div><div class="bibigo-label">The mission</div><p>Turn live match data into information-rich 3D sound so BLV audiences can follow tennis in real time.</p></div>
+            <div><div class="bibigo-label">My role</div><p>Designed a new computer-vision system to track the ball and players, then set up and ran the system on site.</p></div>
+            <div><div class="bibigo-label">This year</div><p>First year ported to Wimbledon — a test year gathering insight ahead of a full rollout in 2027.</p></div>
+          </div>
+
+          <div class="bibigo-hero" style="aspect-ratio:16/9;">
+            <video autoplay muted loop playsinline controls src="/public/action-audio/media2.mp4"></video>
+          </div>
+          <div class="bibigo-pair" style="grid-template-columns:1fr 1fr;">
+            <div style="aspect-ratio:4/3;"><img src="/public/action-audio/desk.jpg" alt="Setting up the Action Audio tracking and mixing system"></div>
+            <div style="aspect-ratio:4/3;"><video autoplay muted loop playsinline src="/public/action-audio/media1.mp4"></video></div>
+          </div>
+          <div class="bibigo-full" style="aspect-ratio:16/9;">
+            <img src="/public/action-audio/centrecourt.jpg" alt="Centre Court, Wimbledon">
+          </div>
+          <p class="bibigo-caption">On-site setup and tracking demo, Wimbledon Championships</p>
+          <a href="https://action-audio.com" class="bibigo-link">action-audio.com →</a>
+        </section>
+
+        <section id="hex-smart-connect" class="file-content bibigo-content">
+          <div class="bibigo-meta">
+            <span class="bibigo-tag">Wearable Tech / BLE — 2025</span>
+            <span class="bibigo-spec">Seeed XIAO nRF52840 · BLE</span>
+          </div>
+          <h1>HEX Smart Connect</h1>
+          <p class="bibigo-intro">Professional events create valuable networking moments, but the experience of turning those moments into connections is still fragmented. Most people you meet usually start with a handshake, so why not turn that into a digital connection?</p>
+
+          <div class="bibigo-cols">
+            <div><div class="bibigo-label">The build</div><p>Using a wristband device, I turned a handshake into a connection, where everyone you shake hands with automatically shares your contact details.</p></div>
+            <div><div class="bibigo-label">Detecting a handshake</div><p>Bluetooth signal strength, a motion detector and device positioning combine to confirm a genuine handshake, not just someone walking past.</p></div>
+            <div><div class="bibigo-label">After the event</div><p>Every confirmed connection resides within an app, ready to review and follow up on once the event is over.</p></div>
+          </div>
+
+          <div class="bibigo-hero" style="aspect-ratio:16/9;">
+            <video autoplay muted loop playsinline controls src="/public/smart-connect/media1.mp4"></video>
+          </div>
+          <div class="bibigo-pair" style="grid-template-columns:1fr 1fr 1fr;">
+            <div><img src="/public/smart-connect/wrist.jpg" alt="Smart Connect wristband worn on the wrist"></div>
+            <div><img src="/public/smart-connect/devices.jpg" alt="Two Smart Connect wristband prototypes"></div>
+            <div><img src="/public/smart-connect/pcb.png" alt="PCB layout for the Smart Connect wristband, built around a Seeed XIAO nRF52840"></div>
           </div>
         </section>
       </div>

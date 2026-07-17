@@ -97,7 +97,27 @@ function initStuffIveBuilt(root) {
 
   const { width, height } = getSize();
   const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
-  camera.position.set(0, 1.2, 7.5);
+
+  // The gallery spreads objects across roughly this half-width/height (world
+  // units) around the origin. On narrow (portrait/mobile) aspect ratios the
+  // horizontal FOV is much tighter than the vertical one, so a fixed camera
+  // distance either clips the outer objects on phones or sits too far back
+  // on desktop. Deriving distance from the live aspect ratio keeps desktop
+  // framing tight while pulling back just enough on narrow screens.
+  const GALLERY_HALF_WIDTH = 3.3;
+  const GALLERY_HALF_HEIGHT = 1.7;
+  const CAMERA_MIN_DIST = 9.2;
+  const CAMERA_MAX_DIST = 14;
+
+  function computeCameraDistance(aspect) {
+    const halfFovRad = THREE.MathUtils.degToRad(camera.fov / 2);
+    const distForHeight = GALLERY_HALF_HEIGHT / Math.tan(halfFovRad);
+    const distForWidth = GALLERY_HALF_WIDTH / (Math.tan(halfFovRad) * aspect);
+    const dist = Math.max(distForHeight, distForWidth);
+    return Math.min(CAMERA_MAX_DIST, Math.max(CAMERA_MIN_DIST, dist));
+  }
+
+  camera.position.set(0, 1.2, computeCameraDistance(camera.aspect));
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(width, height);
@@ -180,6 +200,39 @@ function initStuffIveBuilt(root) {
             <video autoplay controls muted loop src="/public/videos/MicrosoftTeams-video.mp4"></video>
           </div>
         </div>
+
+        <div class="siv-tip-block" data-tip="obj4">
+          <div class="tip-h-con">
+            <h1>Circuit Bent Camcorder</h1>
+            <label>
+              <input type="checkbox" id="keep-texture-chk-4" />
+              Keep texture visible
+            </label>
+          </div>
+          <p>A gutted camcorder rewired through circuit bending — hand-soldered switches and patch points glitch the video pickup into unpredictable, glitchy noise art.</p>
+        </div>
+
+        <div class="siv-tip-block" data-tip="obj5">
+          <div class="tip-h-con">
+            <h1>Smart Pint Glass</h1>
+            <label>
+              <input type="checkbox" id="keep-texture-chk-5" />
+              Keep texture visible
+            </label>
+          </div>
+          <p>An ESP32-driven pint glass with a hand-wired PCB hidden in the base, sensing and reacting live — smart hardware disguised as a night out.</p>
+        </div>
+
+        <div class="siv-tip-block" data-tip="obj6">
+          <div class="tip-h-con">
+            <h1>Smart Connect</h1>
+            <label>
+              <input type="checkbox" id="keep-texture-chk-6" />
+              Keep texture visible
+            </label>
+          </div>
+          <p>A wearable Bluetooth sensor node built around a Seeed XIAO board, battery and fabric strap — pairing skin-worn sensing with an everyday accessory.</p>
+        </div>
       </div>
     </div>
   `;
@@ -190,6 +243,9 @@ function initStuffIveBuilt(root) {
   const chk1 = tooltip.querySelector("#keep-texture-chk-1");
   const chk2 = tooltip.querySelector("#keep-texture-chk-2");
   const chk3 = tooltip.querySelector("#keep-texture-chk-3");
+  const chk4 = tooltip.querySelector("#keep-texture-chk-4");
+  const chk5 = tooltip.querySelector("#keep-texture-chk-5");
+  const chk6 = tooltip.querySelector("#keep-texture-chk-6");
 
   // connectors SVG
   const svgNS = "http://www.w3.org/2000/svg";
@@ -328,28 +384,55 @@ function initStuffIveBuilt(root) {
       type: "gltf",
       name: "CRT TV Oscilloscope",
       url: "/models/crtfony.glb",
-      scale: 1.5,
-      position: { x: -2.0, y: 0.45, z: -0.2 },
+      scale: 1.75,
+      position: { x: -2.375, y: 0.8, z: -0.45 },
       orientation: { x: 0.05, y: 0.45, z: 0 },
       tooltipClass: "obj2",
     },
     {
       type: "gltf",
+      name: "Circuit Bent Camcorder",
+      url: "/models/bent.glb",
+      scale: 6.5,
+      position: { x: -1.425, y: -0.55, z: 0.7 },
+      orientation: { x: 0.04, y: 0.55, z: 0 },
+      tooltipClass: "obj4",
+    },
+    {
+      type: "gltf",
       name: "Mixer",
       url: "/models/Mixer.glb",
-      scale: 1.5,
-      position: { x: 0.15, y: -0.35, z: 1.1 },
+      scale: 1.75,
+      position: { x: -0.475, y: 0.28, z: -0.55 },
       orientation: { x: 0.04, y: -0.12, z: 0 },
       tooltipClass: "obj1",
     },
     {
       type: "gltf",
+      name: "Smart Pint Glass",
+      url: "/models/pintglass.glb",
+      scale: 7.0,
+      position: { x: 0.475, y: -0.7, z: 0.85 },
+      orientation: { x: 0.04, y: -0.3, z: 0 },
+      tooltipClass: "obj5",
+    },
+    {
+      type: "gltf",
       name: "Typewriter",
       url: "/models/typewriter3.glb",
-      scale: 1.5,
-      position: { x: 2.0, y: 0.3, z: 0.1 },
+      scale: 1.75,
+      position: { x: 1.825, y: 1.55, z: 0.0 },
       orientation: { x: 0.04, y: -0.45, z: 0 },
       tooltipClass: "obj3",
+    },
+    {
+      type: "gltf",
+      name: "Smart Connect",
+      url: "/models/smartconnect.glb",
+      scale: 11.0,
+      position: { x: 2.375, y: -0.35, z: 0.55 },
+      orientation: { x: 0.04, y: -0.55, z: 0 },
+      tooltipClass: "obj6",
     },
   ];
 
@@ -385,37 +468,37 @@ function initStuffIveBuilt(root) {
 
   // ------------ tooltip / content logic ------------
 
+  const checkboxesByTooltipKey = {
+    obj1: chk1,
+    obj2: chk2,
+    obj3: chk3,
+    obj4: chk4,
+    obj5: chk5,
+    obj6: chk6,
+  };
+
   function showTooltipContent(tooltipKey) {
     tipBlocks.forEach((el) => {
       el.style.display = "none";
       el.scrollTop = 0;
     });
 
-    let block;
-    if (tooltipKey === "obj1") block = root.querySelector('.siv-tip-block[data-tip="obj1"]');
-    if (tooltipKey === "obj2") block = root.querySelector('.siv-tip-block[data-tip="obj2"]');
-    if (tooltipKey === "obj3") block = root.querySelector('.siv-tip-block[data-tip="obj3"]');
-
+    const block = root.querySelector(`.siv-tip-block[data-tip="${tooltipKey}"]`);
     if (block) {
       block.style.display = "block";
     }
 
     keepTextureVisible = false;
-    [chk1, chk2, chk3].forEach((chk) => {
+    Object.values(checkboxesByTooltipKey).forEach((chk) => {
       if (chk) {
         chk.checked = false;
         chk.onchange = null;
       }
     });
 
-    if (tooltipKey === "obj1" && chk1) {
-      chk1.onchange = () => (keepTextureVisible = chk1.checked);
-    }
-    if (tooltipKey === "obj2" && chk2) {
-      chk2.onchange = () => (keepTextureVisible = chk2.checked);
-    }
-    if (tooltipKey === "obj3" && chk3) {
-      chk3.onchange = () => (keepTextureVisible = chk3.checked);
+    const activeChk = checkboxesByTooltipKey[tooltipKey];
+    if (activeChk) {
+      activeChk.onchange = () => (keepTextureVisible = activeChk.checked);
     }
 
     tooltip.classList.remove("hidden");
@@ -423,7 +506,7 @@ function initStuffIveBuilt(root) {
   }
 
   function resetView() {
-    camera.position.set(0, 1.2, 7.5);
+    camera.position.set(0, 1.2, computeCameraDistance(camera.aspect));
     controls.target.copy(scene.position);
     controls.enableRotate = true;
     controls.enableZoom = false;
@@ -440,7 +523,7 @@ function initStuffIveBuilt(root) {
       el.style.display = "none";
       el.scrollTop = 0;
     });
-    [chk1, chk2, chk3].forEach((chk) => {
+    Object.values(checkboxesByTooltipKey).forEach((chk) => {
       if (chk) chk.checked = false;
     });
   }
@@ -739,6 +822,9 @@ function initStuffIveBuilt(root) {
   const onWindowResize = () => {
     const { width, height } = getSize();
     camera.aspect = width / height;
+    if (!isFocused) {
+      camera.position.z = computeCameraDistance(camera.aspect);
+    }
     camera.updateProjectionMatrix();
     renderer.setSize(width, height);
   };
@@ -1020,6 +1106,8 @@ function showTrashError() {
 
   const projectsFiles = [
     { name: "HEX Bibigo_Scroll.md", sectionId: "bibigo" },
+    { name: "HEX Action_Audio.md", sectionId: "hex-action-audio" },
+    { name: "HEX Smart_Connect.md", sectionId: "hex-smart-connect" },
     { name: "HEX EDA_A-Land-Unfinished.md", sectionId: "project-wearable-xyz" },
     { name: "HEX interactive_music_video_umg.md", sectionId: "project-installation-sensors" },
     { name: "Wax Palace boilerroom_takeover.md", sectionId: "boilerroom" },
@@ -1364,8 +1452,6 @@ function renderDirectoryListingLeft(files) {
 
   attachCloseHandlers(win)
 }
-
-
 
 
   function openStuffIveBuiltPopup() {
