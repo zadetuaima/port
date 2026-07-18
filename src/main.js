@@ -541,59 +541,6 @@ function initStuffIveBuilt(root) {
 
     tooltip.classList.remove("hidden");
     connectorSvg.style.display = "block";
-    startTiltParallax();
-  }
-
-  // ------------ mobile tilt parallax for the popup ------------
-  // On mobile the popup is docked to the bottom of the screen (see the
-  // #siv-tooltip mobile CSS), but a phone held in the hand isn't perfectly
-  // still, so nudge the popup a few px in the direction the device tilts —
-  // gives it a bit of life instead of feeling glued in place.
-  const tooltipContentEl = tooltip.querySelector(".content");
-  const TILT_MAX_SHIFT = 10; // px
-  let tiltBaseline = null;
-  // Browsers without the iOS 13+ permission gate can listen immediately.
-  let tiltGranted = !(
-    typeof DeviceOrientationEvent !== "undefined" &&
-    typeof DeviceOrientationEvent.requestPermission === "function"
-  );
-
-  function applyTilt(e) {
-    if (!tooltipContentEl || tooltip.classList.contains("hidden")) return;
-    const beta = e.beta || 0;   // front-back tilt
-    const gamma = e.gamma || 0; // left-right tilt
-    if (!tiltBaseline) {
-      tiltBaseline = { beta, gamma };
-      return;
-    }
-    const dx = Math.max(-TILT_MAX_SHIFT, Math.min(TILT_MAX_SHIFT, (gamma - tiltBaseline.gamma) * 1.1));
-    const dy = Math.max(-TILT_MAX_SHIFT, Math.min(TILT_MAX_SHIFT, (beta - tiltBaseline.beta) * 1.1));
-    tooltipContentEl.style.transform = `translate(${dx}px, ${dy}px)`;
-  }
-
-  function startTiltParallax() {
-    if (!IS_MOBILE) return;
-    tiltBaseline = null;
-    if (tiltGranted) {
-      window.addEventListener("deviceorientation", applyTilt);
-      return;
-    }
-    // Must be called from a user-gesture handler (the tap that opened this
-    // tooltip) — iOS 13+ requires that for motion-sensor access.
-    DeviceOrientationEvent.requestPermission()
-      .then((state) => {
-        if (state === "granted") {
-          tiltGranted = true;
-          window.addEventListener("deviceorientation", applyTilt);
-        }
-      })
-      .catch(() => {});
-  }
-
-  function stopTiltParallax() {
-    window.removeEventListener("deviceorientation", applyTilt);
-    tiltBaseline = null;
-    if (tooltipContentEl) tooltipContentEl.style.transform = "";
   }
 
   function resetView() {
@@ -605,7 +552,6 @@ function initStuffIveBuilt(root) {
     isFocused = false;
     tooltip.classList.add("hidden");
     connectorSvg.style.display = "none";
-    stopTiltParallax();
     currentMesh = hoverTarget = null;
     tooltipOffset.set(0, 0, 0);
     lastRotation = { x: 0, y: 0, z: 0 };
@@ -849,15 +795,31 @@ function initStuffIveBuilt(root) {
     const up = new THREE.Vector3(0, 1, 0);
     const forward = camera.getWorldDirection(new THREE.Vector3());
     const dir = forward.clone().negate();
-    const FIXED_LEFT = 0.5;
-    const right = new THREE.Vector3().crossVectors(forward, up).normalize();
-    const off = wp.clone().add(right.clone().multiplyScalar(-FIXED_LEFT));
-    const base = off.clone().add(dir.multiplyScalar(dist));
-    const pR = right.clone().multiplyScalar(1);
-    const pU = up.clone().multiplyScalar(0);
 
-    const finalPos = base.clone().add(pR).add(pU);
-    const finalTarget = off.clone().add(pR).add(pU);
+    let finalPos, finalTarget;
+    if (IS_MOBILE) {
+      // Portrait canvas: the horizontal fov is much narrower than desktop's,
+      // so back off far enough for the object to fit across the width
+      // (tan(35°/2) ≈ 0.315 → half-width visible at d is 0.315*d*aspect).
+      const fitDist = md / (0.63 * Math.max(camera.aspect, 0.1)) * 1.6;
+      const mDist = Math.max(dist * 1.4, fitDist);
+      // Bottom-docked popup covers the lower 46vh, so aim the camera dead-on
+      // horizontally and slightly below the object — it then renders centred
+      // in the visible band above the popup. 0.145*d ≈ 23% of the view
+      // height at the camera's 35° fov (50% centre → 27% band centre).
+      finalTarget = wp.clone().sub(up.clone().multiplyScalar(mDist * 0.145));
+      finalPos = finalTarget.clone().add(dir.clone().multiplyScalar(mDist));
+    } else {
+      const FIXED_LEFT = 0.5;
+      const right = new THREE.Vector3().crossVectors(forward, up).normalize();
+      const off = wp.clone().add(right.clone().multiplyScalar(-FIXED_LEFT));
+      const base = off.clone().add(dir.multiplyScalar(dist));
+      const pR = right.clone().multiplyScalar(1);
+      const pU = up.clone().multiplyScalar(0);
+
+      finalPos = base.clone().add(pR).add(pU);
+      finalTarget = off.clone().add(pR).add(pU);
+    }
 
     camera.position.copy(finalPos);
     controls.target.copy(finalTarget);

@@ -1791,6 +1791,7 @@ p {
   }
   #siv-tooltip .content {
     position: relative !important;
+    transform: none !important;
     width: 100vw !important;
     max-width: 100vw !important;
     height: 46vh !important;
@@ -1798,10 +1799,6 @@ p {
     border-right: none;
     border-bottom: none;
     border-radius: 0;
-    /* left un-!important so JS can nudge it with the device's tilt (see
-       startTiltParallax in main.js) instead of it being pinned in place */
-    transform: translate(0, 0);
-    transition: transform 120ms ease-out;
   }
 
   .videojs1,
