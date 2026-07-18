@@ -12,9 +12,12 @@ const IS_MOBILE =
 
 // Videos are marked autoplay for desktop hover previews; on mobile that
 // means every popup blasts sound/motion the moment it opens, so strip it.
+// Only touch videos that have their own controls — a few decorative clips
+// (e.g. bibigo Media2, action-audio media1) have no controls at all and
+// are meant to loop as a background element, so leave those alone.
 function disableAutoplayOnMobile(container) {
   if (!IS_MOBILE) return;
-  container.querySelectorAll("video[autoplay]").forEach((v) => {
+  container.querySelectorAll("video[autoplay][controls]").forEach((v) => {
     v.removeAttribute("autoplay");
     v.pause();
     v.currentTime = 0;
@@ -2014,11 +2017,39 @@ function onUp() {
     appIcon.addEventListener("pointercancel", endPress);
   }
 
+  /* One-time nudge on first load: this site is a floating-window desktop
+     metaphor that doesn't really work on a phone screen, so tell mobile
+     visitors up front. Tap anywhere to dismiss. */
+  function showMobileDesktopNotice() {
+    if (document.querySelector(".ios-desktop-notice")) return;
+
+    const notice = document.createElement("div");
+    notice.className = "ios-desktop-notice";
+    notice.innerHTML = `
+      <div class="ios-desktop-notice-card">
+        <p class="ios-desktop-notice-title">For the best experience, please use on desktop</p>
+        <p class="ios-desktop-notice-sub">Tap anywhere to continue</p>
+      </div>
+    `;
+    document.body.appendChild(notice);
+    requestAnimationFrame(() => notice.classList.add("show"));
+
+    notice.addEventListener(
+      "click",
+      () => {
+        notice.classList.remove("show");
+        setTimeout(() => notice.remove(), 240);
+      },
+      { once: true }
+    );
+  }
+
 let iconWasDragged = false;
 
 if (appIcon) {
   if (IS_MOBILE) {
     setupMobileHomeScreen();
+    showMobileDesktopNotice();
   } else {
     makeIconDraggable(appIcon);
 
