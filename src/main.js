@@ -171,7 +171,7 @@ function initStuffIveBuilt(root) {
             <img src="/img/IMG_1538.jpeg">
             <video autoplay controls muted loop src="/videos/ProCameraVideoFile.mp4"></video>
           </div>
-          <div class="videojs1">
+          <div class="videojsimg">
             <img src="/img/IMG_0680.jpeg">
           </div>
         </div>
@@ -218,7 +218,7 @@ function initStuffIveBuilt(root) {
           </div>
           <div class="videojs2">
             <img src="/img/IMG_2495.jpeg">
-            <img src="/img/IMG_2505.PNG">
+            <img src="/img/IMG_2505.jpg">
           </div>
           </div>
 
@@ -230,9 +230,15 @@ function initStuffIveBuilt(root) {
               Keep texture visible
             </label>
           </div>
-          <p>An ESP32-driven pint glass with a hand-wired PCB hidden in the base, sensing and reacting live — smart hardware disguised as a night out.</p>
+          <p>Smart pint glass detection fluid level via changing capacitance. Once fluid reaches 125ml, external device is notified and orders another drink to be bought to your table.</p>
+        
+          <div class="videojsimg">
+            <img src="/img/beerglass.png">
+          </div>
+          <div class="videojs1">
+            <video autoplay controls muted loop src="/videos/IMG_1357.mov"></video>
+          </div>
         </div>
-
         <div class="siv-tip-block" data-tip="obj6">
           <div class="tip-h-con">
             <h1>Smart Connect</h1>
@@ -241,7 +247,14 @@ function initStuffIveBuilt(root) {
               Keep texture visible
             </label>
           </div>
-          <p>A wearable Bluetooth sensor node built around a Seeed XIAO board, battery and fabric strap — pairing skin-worn sensing with an everyday accessory.</p>
+          <p>A wearable Bluetooth wristband accesory, when two user are wearing it and they shake hands, their details are automatically exchanged.</p>
+          <div class="videojs1">
+            <video autoplay controls muted loop src="/smart-connect/media1.mp4"></video>
+          </div>
+          <div class="videojs2">
+            <img src="/smart-connect/devices.jpg">
+            <img src="/smart-connect/wrist.jpg">
+          </div>
         </div>
       </div>
     </div>
