@@ -541,6 +541,59 @@ function initStuffIveBuilt(root) {
 
     tooltip.classList.remove("hidden");
     connectorSvg.style.display = "block";
+    startTiltParallax();
+  }
+
+  // ------------ mobile tilt parallax for the popup ------------
+  // On mobile the popup is docked to the bottom of the screen (see the
+  // #siv-tooltip mobile CSS), but a phone held in the hand isn't perfectly
+  // still, so nudge the popup a few px in the direction the device tilts —
+  // gives it a bit of life instead of feeling glued in place.
+  const tooltipContentEl = tooltip.querySelector(".content");
+  const TILT_MAX_SHIFT = 10; // px
+  let tiltBaseline = null;
+  // Browsers without the iOS 13+ permission gate can listen immediately.
+  let tiltGranted = !(
+    typeof DeviceOrientationEvent !== "undefined" &&
+    typeof DeviceOrientationEvent.requestPermission === "function"
+  );
+
+  function applyTilt(e) {
+    if (!tooltipContentEl || tooltip.classList.contains("hidden")) return;
+    const beta = e.beta || 0;   // front-back tilt
+    const gamma = e.gamma || 0; // left-right tilt
+    if (!tiltBaseline) {
+      tiltBaseline = { beta, gamma };
+      return;
+    }
+    const dx = Math.max(-TILT_MAX_SHIFT, Math.min(TILT_MAX_SHIFT, (gamma - tiltBaseline.gamma) * 1.1));
+    const dy = Math.max(-TILT_MAX_SHIFT, Math.min(TILT_MAX_SHIFT, (beta - tiltBaseline.beta) * 1.1));
+    tooltipContentEl.style.transform = `translate(${dx}px, ${dy}px)`;
+  }
+
+  function startTiltParallax() {
+    if (!IS_MOBILE) return;
+    tiltBaseline = null;
+    if (tiltGranted) {
+      window.addEventListener("deviceorientation", applyTilt);
+      return;
+    }
+    // Must be called from a user-gesture handler (the tap that opened this
+    // tooltip) — iOS 13+ requires that for motion-sensor access.
+    DeviceOrientationEvent.requestPermission()
+      .then((state) => {
+        if (state === "granted") {
+          tiltGranted = true;
+          window.addEventListener("deviceorientation", applyTilt);
+        }
+      })
+      .catch(() => {});
+  }
+
+  function stopTiltParallax() {
+    window.removeEventListener("deviceorientation", applyTilt);
+    tiltBaseline = null;
+    if (tooltipContentEl) tooltipContentEl.style.transform = "";
   }
 
   function resetView() {
@@ -552,6 +605,7 @@ function initStuffIveBuilt(root) {
     isFocused = false;
     tooltip.classList.add("hidden");
     connectorSvg.style.display = "none";
+    stopTiltParallax();
     currentMesh = hoverTarget = null;
     tooltipOffset.set(0, 0, 0);
     lastRotation = { x: 0, y: 0, z: 0 };
