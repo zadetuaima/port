@@ -2161,6 +2161,19 @@ p {
 .bibigo-link { display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: 0.02em; color: #c9683a; text-decoration: none; border-bottom: 1px solid #c9683a; padding-bottom: 2px; margin-top: 8px; }
 .bibigo-full img { width: 100%; height: 100%; object-fit: contain; display: block; }
 
+/* Action Audio hero/full videos: fill the width edge-to-edge and let height
+   follow the source's own aspect ratio instead of letterboxing to a fixed
+   box (which left black bars top/bottom when the clip didn't match 16:9). */
+.bibigo-hero.no-crop,
+.bibigo-full.no-crop {
+  aspect-ratio: auto;
+}
+.bibigo-hero.no-crop video,
+.bibigo-full.no-crop video {
+  height: auto;
+  object-fit: unset;
+}
+
 /* HEX popups (bibigo / action-audio / smart-connect): the 3-up column grid
    is too cramped at phone widths, so stack it and tighten the type. */
 @media (max-width: 768px), (hover: none) and (pointer: coarse) {
