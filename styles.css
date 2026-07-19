@@ -1770,6 +1770,35 @@ p {
     height: 100% !important;
   }
 
+  /* mobile PDF fallback: tap-to-open card (embed can't render inline) */
+  .pdf-mobile-fallback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    height: 100%;
+    padding: 32px 24px;
+    text-align: center;
+    color: #33FF33;
+  }
+  .pdf-mobile-fallback p {
+    margin: 0;
+    font-size: 1rem;
+    color: #bdbdbd;
+  }
+  .pdf-open-btn {
+    display: inline-block;
+    padding: 14px 26px;
+    border: 1px solid #33FF33;
+    border-radius: 8px;
+    background: #101810;
+    color: #33FF33;
+    font-size: 1.05rem;
+    text-decoration: none;
+  }
+  .pdf-open-btn:active { background: #1b2a1b; }
+
   /* ============ 3D "stuff I've built" ============ */
   #stuff-ive-buit-root,
   #stuff-ive-built-root {

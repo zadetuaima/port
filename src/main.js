@@ -1530,6 +1530,24 @@ function renderDirectoryListingLeft(files) {
 
   document.body.appendChild(win);
   disableAutoplayOnMobile(win);
+
+  // Mobile browsers (esp. iOS Safari) won't render a PDF inside <embed>, so
+  // the CV shows up blank. Swap it for a tap-to-open link that hands the file
+  // to the browser's native full-screen PDF viewer instead.
+  if (ispdfFile && IS_MOBILE) {
+    const embed = win.querySelector("embed");
+    const pdfSrc = embed ? embed.getAttribute("src") : "/creativecvfinalfinal.pdf";
+    const body = win.querySelector(".window-body");
+    if (body) {
+      body.innerHTML = `
+        <div class="pdf-mobile-fallback">
+          <p>PDFs can't preview inline on mobile.</p>
+          <a class="pdf-open-btn" href="${pdfSrc}" target="_blank" rel="noopener">Open CV (PDF)</a>
+        </div>
+      `;
+    }
+  }
+
   document.body.classList.add("modal-open");
   makeDraggable(win);      // handles initial z-index + drag rules
 
