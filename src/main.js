@@ -430,7 +430,7 @@ function initStuffIveBuilt(root) {
     {
       type: "gltf",
       name: "Circuit Bent Camcorder",
-      url: "/models/bent.glb",
+      url: "/models/camcorder.glb",
       scale: 6.5,
       position: { x: -1.425, y: -0.55, z: 0.7 },
       orientation: { x: 0.04, y: 0.55, z: 0 },
