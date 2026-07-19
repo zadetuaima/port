@@ -288,19 +288,19 @@ function initStuffIveBuilt(root) {
         </div>
         <div class="siv-tip-block" data-tip="obj8">
           <div class="tip-h-con">
-            <h1>chopstickprototype_V2</h1>
+            <h1>chopstickprototype_V4</h1>
             <label>
               <input type="checkbox" id="keep-texture-chk-8" />
               Keep texture visible
             </label>
           </div>
-          <p>Rapid prototype for scrollable chopstick, testing feasablity and technical path.</p>
+          <p>Refined prototype for scrollable chopstick, final version before manufacturing.</p>
           <div class="videojsimg">
-            <img src="/img/IMG_0809.jpeg">
+            <img src="/bibigo/chopstick.png">
           </div>
-          <div class="videojs2">
-
-          </div>
+          <div class="videojs1">
+            <video autoplay controls muted loop src="bibigo/Media1.mp4""></video>
+          <div>>
         </div>
       </div>
     </div>
