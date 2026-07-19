@@ -526,10 +526,10 @@ function initStuffIveBuilt(root) {
       block.style.display = "block";
     }
 
-    keepTextureVisible = false;
+    keepTextureVisible = true;
     Object.values(checkboxesByTooltipKey).forEach((chk) => {
       if (chk) {
-        chk.checked = false;
+        chk.checked = true;
         chk.onchange = null;
       }
     });
@@ -792,7 +792,7 @@ function initStuffIveBuilt(root) {
     const md = currentMesh.userData.maxDim || 1;
     const dist = md * 2;
 
-    const up = new THREE.Vector3(0, 1, 0);
+    const up = new THREE.Vector3(0, 1.1, 0);
     const forward = camera.getWorldDirection(new THREE.Vector3());
     const dir = forward.clone().negate();
 
